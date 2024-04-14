@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+
+        }
+
+        .calculator {
+            width: 180px;
+            background-image: url('background.jpg');
+            background-size: 100%;
+            box-shadow: 0 0 3px rgba(0, 0, 0, 2);
+            border-radius: 10px;
+            padding: 10px;
+
+        }
+
+        input[type="text"] {
+            color: #fbf8f3;
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            border: 1px solid #fbf8f3;
+            background-color: transparent;
+
+        }
+
+        .button {
+            align-items: center;
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #ab875e;
+            color: rgb(255, 255, 255);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-family: monospace;
+            text-decoration: dotted;
+        }
+
+        .button:hover {
+            background-color: #725445;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="calculator">
+        <input type="text" id="input" oninput="calculate()">
+        <input type="text" id="result" disabled>
+        <button class="button" onclick="reset()">Reset</button>
+        <button class="button" onclick="convert()">Convert</button>
+    </div>
+    <script>
+        let isFractionToDecimal = true;
+
+        function calculate() {
+            let input = document.getElementById('input').value;
+            try {
+                let result = eval(input);
+                if (isFractionToDecimal && Number.isInteger(result)) {
+                    result = result.toString(); // 整数の場合はそのまま表示
+                } else if (!isFractionToDecimal && !Number.isInteger(result)) {
+                    result = toFraction(result); // 少数の場合は分数に変換
+                }
+                document.getElementById('result').value = result;
+            } catch (error) {
+                document.getElementById('result').value = '(^o^)';
+            }
+        }
+
+        function convert() {
+            isFractionToDecimal = !isFractionToDecimal;
+            calculate(); // ボタンをクリックすると変換を切り替える
+        }
+
+        function reset() {
+            document.getElementById('input').value = '';
+            document.getElementById('result').value = '';
+        }
+
+        // 少数を分数に変換する関数
+        function toFraction(decimal) {
+            decimal = parseFloat(decimal);
+            if (isNaN(decimal)) return 'Invalid input';
+            if (Math.floor(decimal) === decimal) return decimal; // 整数の場合はそのまま返す
+
+            let gcd = function (a, b) { // 最大公約数を求める関数
+                return b ? gcd(b, a % b) : a;
+            };
+            let strDecimal = decimal.toString();
+            let digitsAfterDecimal = strDecimal.length - strDecimal.indexOf('.') - 1;
+            let denominator = Math.pow(10, digitsAfterDecimal);
+            let numerator = decimal * denominator;
+            let divisor = gcd(numerator, denominator);
+            numerator /= divisor;
+            denominator /= divisor;
+            return numerator + '/' + denominator;
+        }
+    </script>
+</body>
+
+</html>
